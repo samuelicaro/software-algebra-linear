@@ -1,0 +1,16 @@
+[project]
+name = "software-algebra-linear"
+version = "0.1.0"
+description = "Software Desenvolvido para a disciplina de Álgebra Linear da faculdade."
+authors = [
+    {name = "Samuel Ícaro"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "matplotlib (>=3.11.2,<4.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
