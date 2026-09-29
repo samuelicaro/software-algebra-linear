@@ -10,11 +10,11 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
-def matriz_escala(sx, sy, inversa=False):
+# inversa é a flag
+def matriz_escala(sx: float, sy:float, inversa: bool = False):
     if inversa:
         sx, sy = 1 / sx, 1 / sy
     return [[sx, 0], [0, sy]]
-
 
 def matriz_rotacao(angulo, inversa=False):
     if inversa:
@@ -23,7 +23,7 @@ def matriz_rotacao(angulo, inversa=False):
     c, s = math.cos(a), math.sin(a)
     return [[c, -s], [s, c]]
 
-
+# o eixo se trata de uma flag informando o tipo de matriz que deve retornar (normal ou inversa)
 def matriz_reflexao(eixo):
     eixo = eixo.lower()
     if eixo == "x":
@@ -32,30 +32,32 @@ def matriz_reflexao(eixo):
         return [[-1, 0], [0, 1]]
     raise ValueError("Eixo deve ser 'x' ou 'y'.")
 
-
+# produto interno
 def multiplicar(a, b):
-    resultado = [[0, 0], [0, 0]]
+    resultado = [[0] * 2 for _ in range(2)]
     for i in range(2):
         for j in range(2):
-            for k in range(2):
+            for k in range(2): # parece meio confuso mas ele percorre a multiplicacao como em a11 * b11 + a12 * b12
                 resultado[i][j] += a[i][k] * b[k][j]
     return resultado
 
-
+# ela funciona meio que como uma 'pilha de transformações', ou seja, ela vai acumulando as transformações
+# pra depois remover
 def compor(matrizes):
     resultado = [[1, 0], [0, 1]]
     for m in matrizes:
         resultado = multiplicar(m, resultado)
     return resultado
 
-
-def aplicar(matriz, ponto):
-    x, y = ponto
+# multiplicacao de uma matriz por um vetor
+def aplicar(matriz, ponto: tuple):
+    x, y = ponto # decompondo uma tupla
     return (matriz[0][0] * x + matriz[0][1] * y,
             matriz[1][0] * x + matriz[1][1] * y)
 
+def transformar(pontos: tuple, matriz):
 
-def transformar(pontos, matriz):
+    # encontra o ponto central
     xs = [p[0] for p in pontos]
     ys = [p[1] for p in pontos]
     cx = (min(xs) + max(xs)) / 2
@@ -63,15 +65,15 @@ def transformar(pontos, matriz):
 
     novos = []
     for x, y in pontos:
-        nx, ny = aplicar(matriz, (x - cx, y - cy))
-        novos.append((nx + cx, ny + cy))
+        nx, ny = aplicar(matriz, (x - cx, y - cy)) # aplica a(s) transformação(ões) e move o polígono pra origem
+        novos.append((nx + cx, ny + cy)) # depois volta pro ponto central do polígono original
     return novos
 
-
+# filtra a entrada dos pontos
 def para_numero(texto):
     return float(texto.strip().replace(",", "."))
 
-
+# regras de entrada de dados com os pontos
 def ler_pontos(texto):
     pontos = []
     for trecho in texto.split(";"):
